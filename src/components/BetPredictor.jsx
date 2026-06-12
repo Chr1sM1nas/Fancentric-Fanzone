@@ -396,7 +396,7 @@ const tierLabels = {
   gold: { label: 'Gold: Locked', locked: true, color: 'gradient-gold' },
 }
 
-export default function BetPredictor() {
+export default function BetPredictor({ onGoHome }) {
   const [activeTier, setActiveTier] = useState('bronze')
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [showPrizes, setShowPrizes] = useState(false)
@@ -416,6 +416,15 @@ export default function BetPredictor() {
             <span className="text-betway-green font-black text-[10px] uppercase">Betway</span>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={onGoHome}
+              className="btn-haptic flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-white/70 text-[9px] font-bold hover:bg-white/10 transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+              Home
+            </button>
             <button
               onClick={() => setShowLeaderboard(true)}
               className="btn-haptic flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-betway-green/60 text-betway-green text-[9px] font-bold border-glow-green"

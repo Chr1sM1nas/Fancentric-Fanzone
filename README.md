@@ -13,6 +13,40 @@ npm run build      # production build  → dist/
 npm run preview    # preview prod build
 ```
 
+## ZITADEL OAuth Setup
+
+This project supports ZITADEL OAuth (Authorization Code + PKCE) for Google, Apple, and email-based sign-in.
+
+1. Copy [.env.example](.env.example) to `.env.local`.
+2. Fill in:
+  - `VITE_ZITADEL_AUTHORITY`
+  - `VITE_ZITADEL_CLIENT_ID`
+  - `VITE_ZITADEL_REDIRECT_URI`
+3. In ZITADEL, set your app redirect URI to match your local/dev URL.
+4. (Optional) add `VITE_ZITADEL_GOOGLE_IDP_HINT` and `VITE_ZITADEL_APPLE_IDP_HINT` if you want provider-specific routing.
+
+If ZITADEL variables are not configured, the app runs in demo mode and bypasses OAuth for local UI testing.
+
+## App DB Reconciliation
+
+The frontend is now set up to reconcile a ZITADEL identity with your app database using the ZITADEL `sub` claim as the immutable external key.
+
+Backend contract:
+
+1. Create the SQL tables in [db/schema.sql](db/schema.sql).
+2. Expose `POST /auth/bootstrap` on your app API.
+3. Accept this payload from the frontend:
+  - `provider`
+  - `providerSubject`
+  - `email`
+  - `emailVerified`
+  - `displayName`
+  - `firstName`
+  - `lastName`
+4. Upsert the internal app user by `(provider, providerSubject)`.
+
+Important rule: use ZITADEL `sub` as the reconciliation key, not email.
+
 ---
 
 ## Embedding (iframe / CTA)

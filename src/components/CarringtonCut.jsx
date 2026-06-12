@@ -1,3 +1,5 @@
+import ScreenTopBar from './ScreenTopBar'
+
 const pillars = [
   {
     icon: '📸',
@@ -64,21 +66,15 @@ const featuredStats = [
   { label: 'Form', value: 'W W D W W', icon: '📈', sub: 'Last 5' },
 ]
 
-export default function CarringtonCut() {
+export default function CarringtonCut({ onGoHome }) {
   return (
     <div className="flex-1 overflow-y-auto scrollbar-hide pb-8">
-      {/* Label / Header */}
-      <div className="px-4 pt-5 pb-4 border-b border-white/8">
-        <p className="text-[9px] text-betway-green uppercase tracking-widest font-bold mb-1">
-          United Intelligence. Betway Exclusive.
-        </p>
-        <h2 className="text-white font-black text-2xl leading-tight mb-1">
-          Inside United.<br />All Season Long.
-        </h2>
-        <p className="text-white/50 text-xs leading-relaxed">
-          Official club content, licensed stats, and Betway match data — one destination, built for United fans.
-        </p>
-      </div>
+      <ScreenTopBar
+        onGoHome={onGoHome}
+        eyebrow="United Intelligence. Betway Exclusive."
+        title={<>Inside United.<br />All Season Long.</>}
+        description="Official club content, licensed stats, and Betway match data — one destination, built for United fans."
+      />
 
       {/* Quick stats row */}
       <div className="flex overflow-x-auto scrollbar-hide gap-3 px-4 py-4">

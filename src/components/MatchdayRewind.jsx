@@ -1,3 +1,5 @@
+import ScreenTopBar from './ScreenTopBar'
+
 const pillars = [
   {
     icon: '🎬',
@@ -81,21 +83,15 @@ const playerReels = [
   { name: 'Rasmus Højlund', role: 'Striker', reels: 7, icon: '💥' },
 ]
 
-export default function MatchdayRewind() {
+export default function MatchdayRewind({ onGoHome }) {
   return (
     <div className="flex-1 overflow-y-auto scrollbar-hide pb-8">
-      {/* Label / Header */}
-      <div className="px-4 pt-5 pb-4 border-b border-white/8">
-        <p className="text-[9px] text-betway-green uppercase tracking-widest font-bold mb-1">
-          Your United. Your Highlights.
-        </p>
-        <h2 className="text-white font-black text-2xl leading-tight mb-1">
-          Every Match.<br />Every Moment. Made for You.
-        </h2>
-        <p className="text-white/50 text-xs leading-relaxed">
-          Official United video content and AI-curated highlights — personalised around the players and moments you care about most.
-        </p>
-      </div>
+      <ScreenTopBar
+        onGoHome={onGoHome}
+        eyebrow="Your United. Your Highlights."
+        title={<>Every Match.<br />Every Moment. Made for You.</>}
+        description="Official United video content and AI-curated highlights — personalised around the players and moments you care about most."
+      />
 
       {/* Recent Highlights */}
       <div className="px-4 pt-4">

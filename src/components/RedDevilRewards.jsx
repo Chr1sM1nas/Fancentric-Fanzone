@@ -1,3 +1,5 @@
+import ScreenTopBar from './ScreenTopBar'
+
 const quests = [
   {
     icon: '⚽',
@@ -64,18 +66,15 @@ const statusConfig = {
   in_progress: { dot: 'bg-amber-400', label: 'In progress', textColor: 'text-amber-400' },
 }
 
-export default function RedDevilRewards() {
+export default function RedDevilRewards({ onGoHome }) {
   return (
     <div className="flex-1 overflow-y-auto scrollbar-hide pb-8">
-      {/* Header */}
-      <div className="px-4 pt-5 pb-4 border-b border-white/8">
-        <h2 className="text-white font-black text-2xl leading-tight mb-1">
-          Your Rewards.<br />Your Record.
-        </h2>
-        <p className="text-white/50 text-xs leading-relaxed">
-          Every prediction, every check-in, every match builds your standing. Keep going.
-        </p>
-      </div>
+      <ScreenTopBar
+        onGoHome={onGoHome}
+        eyebrow="Rewards and progression"
+        title={<>Your Rewards.<br />Your Record.</>}
+        description="Every prediction, every check-in, every match builds your standing. Keep going."
+      />
 
       {/* Collectible progress */}
       <div className="mx-4 mt-4 glass-card rounded-2xl p-4 mb-4">

@@ -1,63 +1,28 @@
 import { useState, useEffect } from 'react'
+import AppIcon from './AppIcons'
 
-const menuItems = [
+const accountActions = [
   {
-    group: 'primary',
-    items: [
-      {
-        icon: '🏟️',
-        label: 'MATCHDAY HUB',
-        sub: 'Predictions, lineups, and live match center.',
-        screen: 'predictor',
-      },
-      {
-        icon: '🏆',
-        label: 'THE 3-TIER PREDICTOR',
-        sub: 'Jump back into your Bronze, Silver, or Gold picks.',
-        screen: 'predictor',
-        badge: true,
-      },
-      {
-        icon: '🧠',
-        label: 'THE CARRINGTON CUT',
-        sub: 'Performance analytics and exclusive tactical stats.',
-        screen: 'carrington',
-      },
-      {
-        icon: '🎬',
-        label: 'MATCHDAY REWIND',
-        sub: 'Your personalised, AI-powered highlights.',
-        screen: 'rewind',
-      },
-    ],
+    icon: 'settings',
+    label: 'Account Settings',
+    sub: 'Profile, linked identity, and verification status.',
+    status: 'Verified 18+',
   },
   {
-    group: 'rewards',
-    items: [
-      {
-        icon: '🎁',
-        label: 'FAN ZONE PRIZES',
-        sub: 'Claim signed merchandise and hospitality entry.',
-        screen: 'rewards',
-        tag: '2 Unlocked',
-      },
-      {
-        icon: '📊',
-        label: 'LEADERBOARDS',
-        sub: 'View global ranks and your custom Friend Leagues.',
-        screen: 'rewards',
-      },
-      {
-        icon: '🎟️',
-        label: 'MY PREDICTION HISTORY',
-        sub: 'Track your past slips, wins, and accuracy rate.',
-        screen: 'rewards',
-      },
-    ],
+    icon: 'help',
+    label: 'Help & Live Chat',
+    sub: 'Get support, FAQs, and responsible play assistance.',
+    status: 'Support online',
+  },
+  {
+    icon: 'history',
+    label: 'Recent Activity',
+    sub: 'Your predictions, rewards progress, and history live in-app.',
+    status: 'Bottom tabs updated',
   },
 ]
 
-export default function BurgerMenu({ isOpen, onClose, onNavigate, currentScreen }) {
+export default function BurgerMenu({ isOpen, onClose, userProfile, appUserSync, onLogout }) {
   const [touchStartX, setTouchStartX] = useState(null)
 
   useEffect(() => {
@@ -77,28 +42,36 @@ export default function BurgerMenu({ isOpen, onClose, onNavigate, currentScreen 
     setTouchStartX(null)
   }
 
-  const handleNavClick = (screen) => {
-    // Haptic feedback (where supported)
-    if (window.navigator && window.navigator.vibrate) {
-      window.navigator.vibrate(10)
-    }
-    onNavigate(screen)
+  const handleLogoutClick = async () => {
     onClose()
+    await onLogout?.()
   }
+
+  const initialsSource = userProfile?.displayName || userProfile?.email || 'Fan Zone Member'
+  const initials = initialsSource
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((token) => token[0])
+    .join('')
+    .toUpperCase()
+
+  const userLabel = userProfile?.displayName || 'Fan Zone Member'
+  const userEmail = userProfile?.email || '@supporter'
 
   return (
     <>
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm animate-fade-in"
+          className="absolute inset-0 z-40 bg-black/70 backdrop-blur-sm animate-fade-in"
           onClick={onClose}
         />
       )}
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 left-0 h-full w-[85vw] max-w-[340px] z-50 flex flex-col transition-transform duration-300 ease-out ${
+        className={`absolute inset-y-0 left-0 w-[84%] max-w-[320px] z-50 flex flex-col transition-transform duration-300 ease-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{ background: 'linear-gradient(180deg, #0F0F0F 0%, #0A0A0A 100%)' }}
@@ -106,19 +79,20 @@ export default function BurgerMenu({ isOpen, onClose, onNavigate, currentScreen 
         onTouchEnd={handleTouchEnd}
       >
         {/* User Header */}
-        <div className="px-5 pt-8 pb-5 border-b border-white/10">
+        <div className="px-4 pt-7 pb-4 border-b border-white/10">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               {/* Avatar */}
               <div className="relative">
                 <div className="w-11 h-11 rounded-full bg-gradient-to-br from-mu-red to-mu-red-dark flex items-center justify-center border-2 border-mu-gold/60">
-                  <span className="text-white font-black text-base">RD</span>
+                  <span className="text-white font-black text-base">{initials || 'F'}</span>
                 </div>
                 <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-betway-green rounded-full border-2 border-mu-black" />
               </div>
               <div>
-                <p className="text-white/50 text-[10px] tracking-wide">WELCOME BACK, RED DEVIL</p>
-                <p className="text-white font-bold text-sm">@RedDevil1878</p>
+                <p className="text-white/50 text-[10px] tracking-wide uppercase">Welcome back</p>
+                <p className="text-white font-bold text-sm leading-tight">{userLabel}</p>
+                <p className="text-white/35 text-[10px] mt-0.5 truncate max-w-[150px]">{userEmail}</p>
               </div>
             </div>
             {/* Close X */}
@@ -133,12 +107,22 @@ export default function BurgerMenu({ isOpen, onClose, onNavigate, currentScreen 
           </div>
 
           {/* Tier badge */}
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full gradient-bronze">
               <span className="w-2 h-2 rounded-full bg-white animate-pulse-dot" />
               <span className="text-white font-bold text-xs tracking-wide">🥉 BRONZE LEVEL</span>
             </div>
+            {appUserSync?.status === 'connected' && (
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-betway-green/15 border border-betway-green/30">
+                <span className="w-2 h-2 rounded-full bg-betway-green" />
+                <span className="text-betway-green font-bold text-[11px] tracking-wide">APP LINKED</span>
+              </div>
+            )}
           </div>
+
+          <p className="text-white/35 text-[10px] leading-relaxed mb-4">
+            Navigation is available below in the bottom tab bar. Use this panel for account, support, and safe-play tools.
+          </p>
 
           {/* Dual balance tracker */}
           <div className="flex items-stretch gap-0">
@@ -165,49 +149,40 @@ export default function BurgerMenu({ isOpen, onClose, onNavigate, currentScreen 
           </div>
         </div>
 
-        {/* Scrollable nav area */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide py-3">
-          {menuItems.map(({ group, items }, gi) => (
-            <div key={group}>
-              {gi > 0 && <div className="mx-5 my-3 h-px bg-white/10" />}
-              <nav className="px-3">
-                {items.map(({ icon, label, sub, screen, badge, tag }) => (
-                  <button
-                    key={label}
-                    onClick={() => handleNavClick(screen)}
-                    className="btn-haptic w-full flex items-center gap-3 px-3 py-3 rounded-xl mb-1 text-left hover:bg-white/5 active:bg-white/10 transition-colors relative"
-                  >
-                    <span className="text-xl w-7 text-center flex-shrink-0">{icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-white font-semibold text-[13px] tracking-wide">{label}</span>
-                        {tag && (
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full gradient-betway text-white">
-                            {tag}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-white/40 text-[11px] mt-0.5 leading-tight">{sub}</p>
-                    </div>
-                    {badge && (
-                      <span className="w-2 h-2 rounded-full bg-mu-red animate-pulse-dot flex-shrink-0" />
-                    )}
-                    <svg className="w-3.5 h-3.5 text-white/25 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                ))}
-              </nav>
-            </div>
-          ))}
+        {/* Scrollable account area */}
+        <div className="flex-1 overflow-y-auto scrollbar-hide py-2">
+          <div className="px-4 pt-3 pb-2">
+            <p className="text-[9px] uppercase tracking-[0.24em] text-white/30 font-bold px-1">Account</p>
+          </div>
+          <div className="px-3 space-y-1">
+            {accountActions.map(({ icon, label, sub, status }) => (
+              <button
+                key={label}
+                className="btn-haptic w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left hover:bg-white/5 active:bg-white/10 transition-colors border border-transparent"
+              >
+                <span className="w-8 h-8 rounded-lg border border-white/10 bg-white/5 text-white/80 flex items-center justify-center flex-shrink-0">
+                  <AppIcon name={icon} className="w-[18px] h-[18px]" />
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-white font-semibold text-[13px] tracking-wide">{label}</span>
+                  </div>
+                  <p className="text-white/40 text-[11px] mt-0.5 leading-tight">{sub}</p>
+                </div>
+                <span className="text-[9px] text-white/30 font-semibold max-w-[56px] text-right">{status}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Utility footer – sticky */}
-        <div className="border-t border-white/10 px-3 pt-3 pb-6">
+        <div className="border-t border-white/10 px-3 pt-3 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
           {/* Responsible Gambling */}
           <div className="px-3 py-2.5 mb-1 rounded-xl bg-amber-500/10 border border-amber-500/20">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-base">🛑</span>
+              <span className="w-5 h-5 rounded-md bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
+                <AppIcon name="responsible" className="w-3.5 h-3.5 text-amber-400" />
+              </span>
               <span className="text-amber-400 font-bold text-[11px] tracking-wide uppercase">Responsible Gambling</span>
             </div>
             <div className="flex flex-wrap gap-x-3 gap-y-1 pl-6">
@@ -220,7 +195,9 @@ export default function BurgerMenu({ isOpen, onClose, onNavigate, currentScreen 
           </div>
 
           <button className="btn-haptic w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors">
-            <span className="text-lg">⚙️</span>
+            <span className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+              <AppIcon name="settings" className="w-[18px] h-[18px] text-white/80" />
+            </span>
             <div className="flex-1 text-left">
               <span className="text-white font-semibold text-[13px]">Account Settings</span>
               <div className="flex items-center gap-1 mt-0.5">
@@ -230,13 +207,20 @@ export default function BurgerMenu({ isOpen, onClose, onNavigate, currentScreen 
           </button>
 
           <button className="btn-haptic w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors">
-            <span className="text-lg">❓</span>
+            <span className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+              <AppIcon name="help" className="w-[18px] h-[18px] text-white/80" />
+            </span>
             <span className="text-white font-semibold text-[13px]">Help &amp; Live Chat Support</span>
           </button>
 
-          <button className="btn-haptic w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors mt-1">
-            <span className="text-lg">🚪</span>
-            <span className="text-white/35 font-medium text-[13px]">Log Out</span>
+          <button
+            onClick={handleLogoutClick}
+            className="btn-haptic w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors mt-1"
+          >
+            <span className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+              <AppIcon name="logout" className="w-[18px] h-[18px] text-white/50" />
+            </span>
+            <span className="text-white/45 font-medium text-[13px]">Log Out</span>
           </button>
         </div>
       </div>
